@@ -7,25 +7,32 @@ export default defineConfig({
   // 🚨 เพิ่ม/แก้ไขส่วนนี้
   server: {
     proxy: {
-      // 1. กฎสำหรับ API Login
+      // Proxy login routes -> local demo backend
       '/api/login': {
-        target: 'http://tanutchapol.trueddns.com:47333', // 👈 เซิร์ฟเวอร์ Login
+        target: 'http://localhost:47333',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/login/, ''), // ลบ /api/login
+        rewrite: (path) => path.replace(/^\/api\/login/, ''),
       },
 
-      // 2. กฎสำหรับ API Chat (AI)
+      // Proxy chat routes -> local demo backend
       '/api/chat': {
-        target: 'http://tanutchapol.trueddns.com:47333', // 👈 ใช้ backend ใหม่ที่ให้มา
+        target: 'http://localhost:47333',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/chat/, ''), // ลบ /api/chat
+        rewrite: (path) => path.replace(/^\/api\/chat/, ''),
       },
 
-      // 3. กฎสำหรับ Facebook API
+      // Proxy Facebook helper routes (apifb) -> local demo backend
       '/apifb': {
-        target: 'http://tanutchapol.trueddns.com:47333',
+        target: 'http://localhost:47333',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/apifb/, ''),
+      },
+
+      // General /api -> backend (images, other api calls)
+      '/api': {
+        target: 'http://localhost:47333',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       }
     }
   }
