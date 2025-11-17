@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot N8N</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+  document.documentElement.classList.add("dark");
+
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: "#eff6ff",
+            100: "#dbeafe",
+            200: "#bfdbfe",
+            300: "#93c5fd",
+            400: "#60a5fa",
+            500: "#3b82f6",
+            600: "#2563eb",
+            700: "#1d4ed8",
+            800: "#1e40af",
+            900: "#1e3a8a",
+          }
+        },
+        boxShadow: {
+          soft: "0 10px 30px rgba(2,6,23,.15)"
+        }
+      }
+    }
+  };
+</script>
+
+    <style>
+      html.dark {
+        color-scheme: dark;
+      }
+    </style>
+  </head>
+
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 
+           dark:from-slate-900 dark:to-slate-950 transition-colors"
+  >
+    <div id="app"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
