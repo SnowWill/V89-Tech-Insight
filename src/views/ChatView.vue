@@ -1,854 +1,452 @@
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center
-           bg-slate-100 dark:bg-[#0f172a]
-           bg-gradient-to-br
-           from-slate-200 to-slate-300
-           dark:from-[#0f172a] dark:to-[#1e293b]">
+  <div class="min-h-screen flex items-center justify-center p-4 bg-slate-100 dark:bg-[#0f172a] bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-50 dark:from-[#0f172a] dark:via-[#1e1e2e] dark:to-[#172033] transition-colors duration-500 font-sans">
 
-    <div class="w-full max-w-3xl">
+    <div class="w-full max-w-4xl flex flex-col h-[85vh] shadow-2xl rounded-3xl overflow-hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700">
 
-      <div class="glass rounded-3xl p-5 border border-black/10 dark:border-white/10 flex justify-between items-center">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-white/50 dark:bg-slate-800/50">
         <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold">
-            V
+          <div class="relative">
+            <div class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-blue-500/30">
+              AI
+            </div>
+            <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white dark:border-slate-800 bg-emerald-500"></span>
           </div>
           <div>
-            <h2 class="text-slate-800 dark:text-white text-xl font-semibold">Welcome, {{ userName }}</h2>
-            <p class="text-slate-600 dark:text-gray-300 text-xs">ล็อกอินแล้ว</p>
+            <h2 class="text-slate-800 dark:text-white text-lg font-bold tracking-tight">n8n AI Assistant</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-medium flex items-center gap-1">
+              {{ typing ? 'กำลังพิมพ์...' : 'พร้อมใช้งาน' }}
+            </p>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-     <!-- ล้าง Session -->
-     <button @click="requestClearSession"
-                  class="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white"
-                  title="ล้างประวัติใน Session นี้">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-              <path fill-rule="evenodd" d="M9 3.75a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75V5h3a.75.75 0 010 1.5h-.443l-1.07 12.305A2.25 2.25 0 0114.246 21H9.754a2.25 2.25 0 01-2.491-2.195L6.193 6.5H5.25a.75.75 0 010-1.5h3V3.75zM8.71 6.5h6.58l1.048 12.06a.75.75 0 01-.747.815H9.754a.75.75 0 01-.747-.815L8.71 6.5zM10.5 9.75a.75.75 0 011.5 0v7.5a.75.75 0 01-1.5 0v-7.5zM13.5 9.75a.75.75 0 011.5 0v7.5a.75.75 0 01-1.5 0v-7.5z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          <!-- ปุ่มตั้งค่า Facebook API (ไอคอน + Popup) -->
-          <button @click="openFbModal"
-                  class="p-2 rounded-xl bg-[#1877F2] hover:brightness-110 text-white"
-                  title="แก้ไข Facebook API">
-            <!-- Facebook gear icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-              <path d="M13.5 2.75a.75.75 0 00-.75.75v2.25h-1.5V3.5a.75.75 0 00-1.5 0v2.25H7.5a.75.75 0 000 1.5h2.25V9.5a.75.75 0 001.5 0V7.25h1.5V9.5a.75.75 0 001.5 0V7.25H18a.75.75 0 000-1.5h-2.25V3.5a.75.75 0 00-1.5 0v2.25h-1.5V3.5a.75.75 0 00-.75-.75z" />
-            </svg>
-          </button>
-          <!-- ออกจากระบบ -->
-          <button @click="logout"
-                  class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white">
-            ออกจากระบบ
-          </button>
+          <button @click="showSettings = true" class="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-all" title="ตั้งค่า">⚙️</button>
+          <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+          <button @click="clearChat" class="p-2.5 rounded-xl text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-slate-700 transition-all" title="ล้างแชท">🗑</button>
+          <button @click="logout" class="p-2.5 rounded-xl text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-slate-700 transition-all" title="ออกจากระบบ">🚪</button>
         </div>
       </div>
 
-      <div class="glass mt-4 rounded-3xl border border-black/10 dark:border-white/10 overflow-hidden">
-        <div ref="chatBox" class="h-[60vh] overflow-y-auto p-5 space-y-4">
-          <div v-for="(m, i) in messages" :key="i" :class="['flex items-start gap-3', m.role === 'user' ? 'justify-end' : '']">
-            <div v-if="m.role==='assistant'" class="h-8 w-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">V</div>
-            <div v-else class="h-8 w-8 rounded-xl bg-gray-500 text-white flex items-center justify-center font-bold order-2">U</div>
-            <div :class="['max-w-[75%] px-4 py-3 rounded-2xl border', m.role==='assistant' ? 'bg-white/60 text-slate-900 border-slate-200 dark:bg-white/10 dark:text-white dark:border-white/20' : 'bg-blue-600 text-white border-blue-700']">
-              <!-- แสดงรูปภาพถ้ามี -->
-              <div v-if="m.image" class="mb-2">
-                <img :src="m.image" :alt="m.text" class="max-w-full h-auto rounded-lg max-h-64 object-cover" />
+      <div class="flex-1 overflow-hidden relative bg-slate-50/50 dark:bg-[#0b1120]/50">
+        <div ref="chatBox" class="h-full overflow-y-auto p-6 space-y-6 scroll-smooth custom-scrollbar">
+
+          <div v-for="m in messages" :key="m.id" class="animate-fade-in-up group flex w-full" :class="m.role === 'user' ? 'justify-end' : 'justify-start'">
+            <div v-if="m.role==='assistant'" class="mr-3 flex-shrink-0 self-end">
+              <div class="h-8 w-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md">AI</div>
+            </div>
+
+            <div :class="['max-w-[85%] lg:max-w-[75%] rounded-2xl shadow-sm px-5 py-3.5 relative transition-all', m.role === 'assistant' ? 'bg-white text-slate-800 rounded-bl-none border border-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700' : 'bg-blue-600 text-white rounded-br-none shadow-blue-500/20']">
+
+              <div v-if="m.image" class="mb-3 overflow-hidden rounded-xl border border-black/10 dark:border-white/10">
+                <img :src="m.image" class="max-w-full h-auto max-h-80 object-cover hover:scale-105 transition-transform duration-500 cursor-pointer" @click="openImage(m.image)"/>
               </div>
-              <div class="whitespace-pre-wrap">{{ formatDisplay(m.text) }}</div>
-              <div class="text-xs opacity-50 mt-1">{{ m.time }}</div>
-                <!-- Quick reply buttons / actions -->
-                <div v-if="m.actions && m.actions.length" class="mt-3 flex gap-2 flex-wrap">
-                  <button
-                    v-for="(a, ai) in m.actions"
-                    :key="ai"
-                    @click="handleAction(m, a)"
-                    class="px-3 py-1 rounded-full text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-1"
-                    :class="actionButtonClasses(a, m)"
-                  >
-                    {{ a.label }}
-                  </button>
-                </div>
+
+              <div class="prose prose-sm max-w-none dark:prose-invert leading-relaxed whitespace-pre-wrap break-words" v-html="renderMessage(m.text)"></div>
+
+              <div :class="['text-[10px] mt-1 text-right font-medium', m.role==='assistant' ? 'text-slate-400' : 'text-blue-100/80']">{{ m.time }}</div>
             </div>
           </div>
-          <div v-if="typing" class="flex items-start gap-3">
-            <div class="h-8 w-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">V</div>
-            <div class="max-w-[75%] px-4 py-3 rounded-2xl border bg-white/60 text-slate-900 border-slate-200 dark:bg-white/10 dark:text-white dark:border-white/20">
-              <span class="inline-flex items-center gap-2">
-                <span class="text-sm">กำลังพิมพ์</span>
-                <span class="inline-flex">
-                  <span class="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:-.2s]"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-current animate-bounce mx-1"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:.2s]"></span>
-                </span>
-              </span>
+
+          <div v-if="typing" class="flex justify-start animate-fade-in-up">
+            <div class="mr-3 flex-shrink-0 self-end">
+              <div class="h-8 w-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold">AI</div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 px-4 py-3 rounded-2xl rounded-bl-none border border-slate-100 dark:border-slate-700 shadow-sm flex items-center gap-1.5">
+              <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
+              <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-75"></span>
+              <span class="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-150"></span>
             </div>
           </div>
         </div>
-        <form @submit.prevent="send" class="p-5 border-t border-black/10 dark:border-white/10 flex items-center gap-3">
-          <input
-            v-model="draft"
-            @input="enforceCharLimit"
-            placeholder="พิมพ์ข้อความ..."
-            class="flex-1 px-4 py-3 rounded-xl bg-white/60 border border-slate-300 text-slate-900 placeholder-slate-400 outline-none dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-gray-400"
-          />
-          <!-- ปุ่มอัปโหลดรูป -->
-          <label class="p-2 rounded-xl bg-green-600 hover:bg-green-700 text-white cursor-pointer" title="อัปโหลดรูป">
-            📷
-            <input
-              type="file"
-              accept="image/*"
-              @change="handleImageUpload"
-              class="hidden"
-            />
-          </label>
-          <div
-            class="text-xs select-none"
-            :class="charCount >= maxChars ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-gray-400'"
-            title="จำกัดไม่เกิน 1500 ตัวอักษร"
-          >
-            {{ charCount }}/{{ maxChars }} ตัวอักษร
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 p-4 z-20">
+        <div v-if="pendingImage" class="mb-3 flex items-start gap-3 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-blue-200 dark:border-blue-900 animate-fade-in-up">
+          <div class="relative group">
+            <img :src="pendingImage" class="h-20 w-20 object-cover rounded-lg shadow-sm border border-slate-200 dark:border-slate-700" />
+            <button @click="removeImage" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-transform hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
           </div>
-          <button :disabled="typing || !draft.trim()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl text-white disabled:opacity-50">ส่ง</button>
+          <div class="text-xs text-slate-500 mt-1">
+            <p class="font-semibold text-slate-700 dark:text-slate-300">แนบรูปภาพแล้ว</p>
+            <p>พร้อมส่งไปให้ AI วิเคราะห์</p>
+          </div>
+        </div>
+
+        <form @submit.prevent="sendMessage" class="relative flex items-end gap-2">
+          <label class="flex-shrink-0 p-3 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors cursor-pointer" title="อัปโหลดรูป">
+            <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="handleImageSelect" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </label>
+          <textarea
+            v-model="draft"
+            @keydown.enter.exact.prevent="sendMessage"
+            @input="autoResize"
+            ref="textArea"
+            rows="1"
+            placeholder="พิมพ์ข้อความ... (พิมพ์ 'โพสต์' เพื่อเริ่มโพสต์ Facebook)"
+            class="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white rounded-xl border-0 focus:ring-2 focus:ring-blue-500 resize-none max-h-32 custom-scrollbar placeholder:text-slate-400 shadow-inner"
+          ></textarea>
+          <button type="submit" :disabled="typing || (!draft.trim() && !pendingImage)" class="flex-shrink-0 p-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-600/40 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-200 transform active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
         </form>
       </div>
     </div>
-  </div>
-  <!-- Modal: Facebook Settings -->
-  <div v-if="showFbModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-800 border border-black/10 dark:border-white/10 p-5">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">ตั้งค่า Facebook API</h3>
-        <button @click="closeFbModal" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white" title="ปิด">
-          ✕
-        </button>
-      </div>
 
-      <div class="space-y-3">
-        <div>
-          <label class="block text-sm text-slate-600 dark:text-gray-300 mb-1">Page ID</label>
-          <input v-model="fbForm.pageId" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-white/10 text-slate-900 dark:text-white" placeholder="1234567890" />
+    <div v-if="showSettings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" @click.self="showSettings = false">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-700">
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">ตั้งค่าการเชื่อมต่อ</h3>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">n8n Webhook URL (POST)</label>
+          <input v-model="webhookUrl" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
         </div>
-        <div>
-          <label class="block text-sm text-slate-600 dark:text-gray-300 mb-1">Access Token</label>
-          <input v-model="fbForm.accessToken" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-white/10 text-slate-900 dark:text-white" placeholder="EAAB..." />
+        <div class="flex justify-end gap-2">
+          <button @click="showSettings = false" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">ยกเลิก</button>
+          <button @click="saveSettings" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md">บันทึก</button>
         </div>
-        <div>
-          <label class="block text-sm text-slate-600 dark:text-gray-300 mb-1">Graph API Version</label>
-          <div class="relative">
-            <button type="button"
-                    @click="showVersionMenu = !showVersionMenu"
-                    class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-white/10 text-slate-900 dark:text-white flex justify-between items-center">
-              <span>{{ fbForm.graphVersion }}</span>
-              <span class="opacity-60">▾</span>
-            </button>
-            <ul v-if="showVersionMenu"
-                class="absolute z-10 mt-1 w-full max-h-40 overflow-y-auto rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow">
-              <li v-for="v in graphVersions" :key="v">
-                <button type="button"
-                        @click="chooseVersion(v)"
-                        class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  {{ v }}
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-4 flex gap-2">
-        <button @click="verifyFbSettings" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white">ตรวจสอบ</button>
-        <button @click="saveFbSettings" class="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white">บันทึก</button>
-      </div>
-
-      <div v-if="fbStatus" class="mt-3 text-sm" :class="fbStatus.ok ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
-        {{ fbStatus.message }}
       </div>
     </div>
+
+    <div v-if="showPostModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" @click.self="showPostModal = false">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-lg border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500"></div>
+
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+          <span class="text-2xl">🚀</span> AI Auto-Post
+        </h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">AI จะช่วยเขียนแคปชั่นและโพสต์ลง Facebook ให้ทันที</p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">หัวข้อที่ต้องการโพสต์ (Topic)</label>
+            <input
+              v-model="postTopic"
+              placeholder="เช่น ประโยชน์ของ AI, โปรโมชั่นร้านกาแฟ..."
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              @keyup.enter="handlePostSubmit"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex justify-between">
+              Facebook Page Access Token
+              <a href="https://drive.google.com/drive/folders/1tWrW3VbO6Q49B_ljYIZ35x_ve5argf4t?usp=sharing" target="_blank" class="text-xs text-blue-500 hover:underline">รับ Token ที่นี่</a>
+            </label>
+            <input
+              v-model="fbToken"
+              type="password"
+              placeholder="EAAB..."
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8">
+          <button @click="showPostModal = false" class="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 font-medium transition-colors">ยกเลิก</button>
+          <button
+            @click="handlePostSubmit"
+            :disabled="!postTopic || !fbToken"
+            class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transition-all flex items-center gap-2"
+          >
+            <span>✨ สร้างและโพสต์</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, computed } from 'vue'
+import { ref, nextTick, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
+// ถ้าลง npm install marked dompurify แล้ว ให้ uncomment 2 บรรทัดล่างนี้
+// import { marked } from 'marked'
+// import DOMPurify from 'dompurify'
+
 const router = useRouter()
 
-/* -----------------------------
-   State
------------------------------ */
-const messages = ref([
-  { role: 'assistant', text: 'สวัสดีครับ! ถามได้เลย 😊', time: now() }
-])
+// --- Configuration ---
+const DEFAULT_N8N_URL = 'http://localhost:5678/webhook/3ea4dd57-2ebf-46dd-9e1b-7e2bf41d936d/chat'
+const SESSION_KEY = 'n8n_chat_session_id'
+const HISTORY_KEY = 'n8n_chat_history'
+
+// --- State ---
+const messages = ref([])
 const draft = ref('')
-const chatBox = ref(null)
 const typing = ref(false)
-const userName = ref('user') // (ค่าเริ่มต้น)
-// state สำหรับเสนอปุ่มโพสต์ Facebook หลังสร้างคอนเทนต์ FB
-const pendingPostFacebook = ref(false)
-// Modal state & form สำหรับตั้งค่า Facebook API
-const showFbModal = ref(false)
-const fbForm = ref({ pageId: '', accessToken: '', graphVersion: 'v23.0' })
-const fbStatus = ref(null)
-const graphVersions = ['v23.0','v22.0','v21.0','v20.0','v19.0','v18.0','v17.0','v16.0']
-const showVersionMenu = ref(false)
-// รอให้ผู้ใช้ระบุหัวข้อคอนเทนต์ก่อนค่อยสร้าง (ค่า: 'gen-fb' | 'gen-shortcaption' | null)
-const awaitingContentKind = ref(null)
+const chatBox = ref(null)
+const textArea = ref(null)
+const imageInput = ref(null)
+const pendingImage = ref(null)
+const showSettings = ref(false)
+const webhookUrl = ref(localStorage.getItem('n8nWebhookUrl') || DEFAULT_N8N_URL)
 
-// จำกัดจำนวนตัวอักษรสูงสุด (1500 ตัวอักษร) แบบรองรับ grapheme cluster
-const maxChars = 1500
+// Post Modal State
+const showPostModal = ref(false)
+const postTopic = ref('')
+const fbToken = ref('')
 
-function graphemeSegments(text) {
-  try {
-    const S = globalThis?.Intl?.Segmenter
-    if (!S) return null
-    const seg = new S('th', { granularity: 'grapheme' })
-    return Array.from(seg.segment(text))
-  } catch {
-    return null
-  }
+// --- Initialization ---
+let sessionId = localStorage.getItem(SESSION_KEY)
+if (!sessionId) {
+  sessionId = 'sess-' + Math.random().toString(36).substring(2) + Date.now().toString(36)
+  localStorage.setItem(SESSION_KEY, sessionId)
 }
 
-function countGraphemes(text) {
-  if (!text) return 0
-  const segs = graphemeSegments(text)
-  if (segs) return segs.length
-  // fallback: นับด้วย code points
-  return Array.from(text).length
-}
-
-const charCount = computed(() => countGraphemes(draft.value || ''))
-
-function enforceCharLimit() {
-  const text = draft.value || ''
-  if (!text) return
-  if (countGraphemes(text) <= maxChars) return
-
-  const segs = graphemeSegments(text)
-  if (segs) {
-    // รวมจนถึงตัวอักษรที่ maxChars เพื่อรักษาขอบเขต grapheme
-    const kept = segs.slice(0, maxChars)
-    const last = kept[kept.length - 1]
-    const endIndex = last.index + last.segment.length
-    draft.value = text.slice(0, endIndex)
-    return
-  }
-  // fallback: ตัดด้วย code points
-  draft.value = Array.from(text).slice(0, maxChars).join('')
-}
-
-/* -----------------------------
-   API Endpoints (ใช้ Proxy)
------------------------------ */
-// โหมด Session (จะบันทึกลงชีตอัตโนมัติจากแบ็กเอนด์)
-const SESSION_ID = 'demo1'
-const SESSION_MESSAGE_URL = `/api/chat/ai-typhon/session/${SESSION_ID}/message`
-const SESSION_HISTORY_URL = `/api/chat/ai-typhon/session/${SESSION_ID}/history`
-const SESSION_DELETE_URL = `/api/chat/ai-typhon/session/${SESSION_ID}`
-const AUTH_ME_URL = '/api/login/auth/me'
-
-/* -----------------------------
-   Lifecycle Hook (onMounted)
------------------------------ */
 onMounted(() => {
-  if (localStorage.getItem('loggedIn') !== 'yes') {
-    router.push('/login');
-    return;
+  const savedHistory = localStorage.getItem(HISTORY_KEY)
+  if (savedHistory) {
+    try { messages.value = JSON.parse(savedHistory) } catch (e) {}
   }
 
-  // 💡 [อัปเดต]
-  // 1. ดึงชื่อที่บันทึกไว้มาแสดงผลทันที (เพื่อความเร็ว)
-  const savedName = localStorage.getItem('userName');
-  if (savedName) {
-    userName.value = savedName;
-  }
-
-  // 2. เรียก fetchUser() เพื่อยืนยัน Token และดึงชื่อล่าสุด
-  // (ถ้า Token หมดอายุ, fetchUser() จะสั่ง Logout ให้อัตโนมัติ)
-  fetchUser();
-  // โหลดประวัติ Session มาแสดง (ถ้ามี)
-  loadSessionHistory();
-});
-
-/* -----------------------------
-   ดึงข้อมูลผู้ใช้ (ยืนยัน Token)
------------------------------ */
-async function fetchUser() {
-  const token = getToken();
-  if (!token) {
-    logout();
-    return;
-  }
-
-  try {
-    const response = await axios.get(AUTH_ME_URL, {
-      headers: { 'Authorization': `Bearer ${token}` }
+  if (messages.value.length === 0) {
+    messages.value.push({
+      id: Date.now(),
+      role: 'assistant',
+      text: 'สวัสดีครับ! ผมพร้อมช่วยงานแล้ว 🤖\n(พิมพ์คำว่า **"โพสต์"** เพื่อสั่งงานโพสต์ Facebook ได้เลยครับ)',
+      time: getTime()
     })
+  }
+  scrollToBottom()
+})
 
-    // (อัปเดตชื่อที่แสดงผล ด้วยข้อมูลล่าสุดจาก /auth/me)
-    const latestName = response?.data?.user?.name
-      || response?.data?.name
-      || response?.data?.username
-      || null
+watch(messages, (newMessages) => {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(newMessages))
+}, { deep: true })
 
-    if (latestName) {
-      userName.value = latestName
-      // (อัปเดต localStorage เผื่อชื่อมีการเปลี่ยนแปลง)
-      localStorage.setItem('userName', latestName);
-    } else {
-      userName.value = 'User'
-    }
+// --- Helpers ---
+const getTime = () => new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
 
-  } catch (error) {
-    // ถ้าได้ 401 -> Token หมดอายุ/ไม่ถูกต้อง ให้ Logout
-    const status = error?.response?.status
-    if (status === 401) {
-      console.warn('Auth check returned 401 — logging out')
-      logout()
-      return
-    }
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatBox.value) chatBox.value.scrollTo({ top: chatBox.value.scrollHeight, behavior: 'smooth' })
+  })
+}
 
-    // ไม่ใช่ 401 (network error / CORS / API down): อย่า redirect ทันที
-    // ใช้ชื่อจาก localStorage เป็น fallback เพื่อไม่ให้ผู้ใช้หลุดออก
-    console.warn("Failed to fetch user (non-401). Falling back to saved/demo name:", error?.message)
-    const savedName = localStorage.getItem('userName')
-    userName.value = savedName || 'Demo User'
+const autoResize = () => {
+  const el = textArea.value
+  if (el) {
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 128) + 'px'
   }
 }
 
-/* -----------------------------
-   ส่งข้อความ (Chat)
------------------------------ */
-const send = () => {
-  if (!draft.value.trim() || typing.value) return
-
-  const q = draft.value
-  messages.value.push({ role: 'user', text: q, time: now() })
-  draft.value = ''
-
-  nextTick(scroll)
-  // ถ้าผู้ใช้พิมพ์คำว่า 'คอนเทน' และยังไม่ได้เลือกชนิดคอนเทนต์
-  // ให้แสดงเฉพาะปุ่มตัวเลือก (ไม่ต้องเรียก AI ตอบ)
-  const lowered = (q || '').toLowerCase()
-  if (!awaitingContentKind.value && lowered.includes('คอนเทน')) {
-    trySuggestContentActions(q)
-    return
-  }
-  // ถ้าอยู่ในโหมดรอหัวข้อคอนเทนต์ ให้ใช้ข้อความนี้เป็นแหล่งเนื้อหา แล้วค่อยสร้างตามชนิดที่เลือก
-  if (awaitingContentKind.value) {
-    const kind = awaitingContentKind.value
-    const prompt = buildContentPrompt(kind, q)
-    // หลังจากได้หัวข้อแล้ว ออกจากโหมดรอหัวข้อ
-    awaitingContentKind.value = null
-    // ถ้าเป็นคอนเทนต์ Facebook เตรียมปุ่มโพสต์ต่อทันทีหลังได้ผลลัพธ์
-    if (kind === 'gen-fb' || kind === 'gen-shortcaption') pendingPostFacebook.value = true
-    // แทรกข้อความผู้ใช้ที่เป็นหัวข้อไปแล้ว จากนั้นให้ AI ตอบด้วย prompt ที่ประกอบขึ้น
-    nextTick(scroll)
-    respond(prompt)
-    return
-  }
-
-  // โหมดปกติ: ส่งข้อความให้ AI ตอบตามเดิม
-  respond(q)
+const saveSettings = () => {
+  localStorage.setItem('n8nWebhookUrl', webhookUrl.value)
+  showSettings.value = false
 }
 
-/* Handle Image Upload */
-function handleImageUpload(e) {
+const clearChat = () => {
+  if(!confirm('ต้องการล้างประวัติการแชททั้งหมด?')) return
+  messages.value = [{ role: 'assistant', text: 'ล้างหน้าจอเรียบร้อย เริ่มใหม่ได้เลยครับ ✨', time: getTime() }]
+  localStorage.removeItem(HISTORY_KEY)
+  sessionId = 'sess-' + Math.random().toString(36).substring(2) + Date.now().toString(36)
+  localStorage.setItem(SESSION_KEY, sessionId)
+}
+
+const logout = () => {
+  localStorage.removeItem('loggedIn')
+  router.push('/login')
+}
+
+// --- Formatting ---
+const renderMessage = (text) => {
+  if (!text) return ''
+
+  // ถ้ามี marked/dompurify
+  // return DOMPurify.sanitize(marked.parse(text))
+
+  // Fallback: Basic formatting (อนุญาต Link <a href>)
+  // 1. Escape HTML chars (ยกเว้นแท็กที่เราจะอนุญาตทีหลัง)
+  let safeText = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+
+  // 2. Convert Newlines to <br>
+  safeText = safeText.replace(/\n/g, '<br>')
+
+  // 3. Bold (**...**) -> <b>...</b>
+  safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+
+  // 4. Auto-link URLs (แปลง http/https เป็น <a>)
+  const urlRegex = /(https?:\/\/[^\s<]+)/g
+  safeText = safeText.replace(urlRegex, '<a href="$1" target="_blank" class="text-blue-500 hover:underline break-all">$1</a>')
+
+  return safeText
+}
+
+// --- Image Handling ---
+const dataURLtoFile = (dataurl, filename) => {
+  const arr = dataurl.split(',')
+  const mimeMatch = arr[0].match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) u8arr[n] = bstr.charCodeAt(n)
+  return new File([u8arr], filename, { type: mime })
+}
+
+const handleImageSelect = (e) => {
   const file = e.target.files?.[0]
-  if (!file) return
-
+  if (!file || file.size > 5 * 1024 * 1024) {
+    alert('ไฟล์ใหญ่เกิน 5MB')
+    return
+  }
   const reader = new FileReader()
-  reader.onload = (event) => {
-    const imageData = event.target?.result
-    if (imageData) {
-      // เพิ่มรูปให้ผู้ใช้ส่ง
-      messages.value.push({
-        role: 'user',
-        text: '📷 [ส่งรูปภาพ]',
-        image: imageData,
-        time: now()
-      })
-      nextTick(scroll)
-
-      // ให้ AI ตอบกลับ
-      respond('ฉันส่งรูปภาพมาให้คุณดูครับ')
-    }
+  reader.onload = (evt) => {
+    pendingImage.value = evt.target.result
+    e.target.value = ''
+    scrollToBottom()
   }
   reader.readAsDataURL(file)
 }
 
-/* -----------------------------
-   ตอบข้อความ (Chat API)
------------------------------ */
-async function respond(q) {
+const removeImage = () => {
+  pendingImage.value = null
+  if(imageInput.value) imageInput.value.value = ''
+}
+
+const openImage = (url) => window.open(url, '_blank')
+
+// --- Special Action: Facebook Post ---
+const handlePostSubmit = async () => {
+  if (!postTopic.value || !fbToken.value) return
+  const topic = postTopic.value
+  const token = fbToken.value
+
+  showPostModal.value = false
+  postTopic.value = ''
+  // fbToken.value = '' // ถ้าอยากให้จำ Token ไว้ไม่ต้องล้างบรรทัดนี้
+
+  messages.value.push({
+    id: Date.now(),
+    role: 'user',
+    text: `🚀 กำลังดำเนินการสร้างและโพสต์...\nหัวข้อ: "${topic}"`,
+    time: getTime()
+  })
+
   typing.value = true
-  const payload = {
-    content: q,
-    max_tokens: 1000,
-    temperature: 0.7
-  }
+  scrollToBottom()
 
   try {
-    const token = getToken()
-    const response = await axios.post(
-      SESSION_MESSAGE_URL,
-      payload,
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-    )
-    const ans = response?.data?.reply
-      || response?.data?.raw?.choices?.[0]?.message?.content
-      || response?.data?.raw?.output_text
-      || response?.data?.raw?.text
-      || '(no reply)'
-    const assistantMsg = {
-      role: 'assistant',
-      text: ans,
-      time: now()
-    }
-    if (pendingPostFacebook.value) {
-      assistantMsg.actions = [
-        { label: '📣 โพสต์ Facebook เลย', value: 'post-facebook' },
-        { label: '📝 คัดลอกข้อความ', value: 'copy-text' },
-        { label: '❌ ยกเลิก', value: 'cancel-post-facebook' },
-      ]
-      pendingPostFacebook.value = false
-    }
-    messages.value.push(assistantMsg)
-    // ไม่ต้องเรียก logChat() เพราะแบ็กเอนด์บันทึกลง Sheet3 ให้อัตโนมัติใน session endpoint
-  } catch (error) {
-    console.error("API Error (Fallback to Demo):", error);
-    const ans = generateDemoReply(q)
-    messages.value.push({
-      role: 'assistant',
-      text: ans,
-      time: now()
-    })
-    // โหมด Demo: บันทึกประวัติใน localStorage
-    saveToLocalStorage()
-  }
-  typing.value = false
-  nextTick(scroll)
+    const form = new FormData()
+    form.append('mode', 'facebook_post') // *** ตัวบอก n8n ว่านี่คือโหมดโพสต์ ***
+    form.append('topic', topic)
+    form.append('fb_token', token)
+    form.append('sessionId', sessionId)
 
-  // ✅ Keyword trigger: ถ้าข้อความผู้ใช้มีคำว่า 'คอนเทน' ให้เสนอชุดตัวเลือกช่วยสร้างคอนเทนต์
-  trySuggestContentActions(q)
-}
-
-/* -----------------------------
-   Helper
------------------------------ */
-
-// ล้าง Session และรีเซ็ตข้อความบนจอ
-async function clearSession() {
-  const token = getToken()
-
-  try {
-    if (token) {
-      // พยายามลบจาก API ถ้ามี
-      try {
-        await axios.delete(SESSION_DELETE_URL, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      } catch (apiError) {
-        console.warn('API clearSession failed (Demo Mode):', apiError?.message)
-      }
-    }
-  } catch (e) {
-    console.warn('clearSession error:', e?.message)
-  }
-
-  // Demo Mode: รีเซ็ต UI เสมอ
-  await resetChatUI()
-}
-
-// แสดงข้อความยืนยันในห้องแชท พร้อมปุ่มตอบแบบ quick reply
-function requestClearSession() {
-  // ถ้ามีคำถามยืนยันค้างอยู่แล้ว ไม่ต้องเพิ่มซ้ำ
-  const exists = messages.value.some(m => Array.isArray(m.actions) && m.actions.some(a => a.value === 'confirm-delete-session'))
-  if (exists) return
-  messages.value.push({
-    role: 'assistant',
-    text: 'ต้องการล้างประวัติแชทของห้องนี้หรือไม่?',
-    time: now(),
-    actions: [
-      { label: '✅ ลบเลย', value: 'confirm-delete-session' },
-      { label: '❌ ยกเลิก', value: 'cancel-delete-session' },
-    ]
-  })
-  nextTick(scroll)
-}
-
-// จัดการการกดปุ่มตอบแบบ quick reply
-async function handleAction(message, action) {
-  if (!action || !action.value) return
-  // ลบปุ่มออกจากข้อความเดิม (กันกดซ้ำ)
-  message.actions = []
-  if (action.value === 'confirm-delete-session') {
-    await clearSession()
-  } else if (action.value === 'cancel-delete-session') {
-    messages.value.push({ role: 'assistant', text: 'ยกเลิกการล้างประวัติแล้ว', time: now() })
-    await nextTick()
-    scroll()
-  } else if (action.value.startsWith('gen-')) {
-    // เข้าสู่โหมดรอหัวข้อคอนเทนต์: ให้ผู้ใช้พิมพ์หัวข้อ/รายละเอียดก่อน แล้วค่อยสร้าง
-    awaitingContentKind.value = action.value
-    messages.value.push({
-      role: 'assistant',
-      text: 'ระบุหัวข้อ/รายละเอียดคอนเทนต์ที่ต้องการ แล้วกดส่งนะครับ',
-      time: now()
-    })
-    await nextTick(); scroll();
-  } else if (action.value === 'post-facebook') {
-    await postFacebook(message?.text || '')
-  } else if (action.value === 'cancel-post-facebook') {
-    messages.value.push({ role: 'assistant', text: 'ยกเลิกการโพสต์ไปยัง Facebook แล้ว', time: now() })
-    await nextTick(); scroll();
-  } else if (action.value === 'copy-text') {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(String(message?.text || ''))
-        messages.value.push({ role: 'assistant', text: 'คัดลอกข้อความแล้ว 📋', time: now() })
-      } else {
-        messages.value.push({ role: 'assistant', text: 'เบราว์เซอร์ไม่รองรับการคัดลอกอัตโนมัติ', time: now() })
-      }
-      await nextTick(); scroll();
-    } catch {
-      messages.value.push({ role: 'assistant', text: 'คัดลอกไม่สำเร็จ', time: now() })
-      await nextTick(); scroll();
-    }
-  }
-}
-function now() {
-  return new Date().toLocaleTimeString('th-TH')
-}
-function scroll() {
-  if (chatBox.value) {
-    chatBox.value.scrollTop = chatBox.value.scrollHeight
+    const res = await axios.post(webhookUrl.value, form)
+    handleResponse(res.data)
+  } catch (err) {
+    handleError(err)
   }
 }
 
-// กำหนดคลาสสีของปุ่มตามประเภท action
-function actionButtonClasses(a, m) {
-  if (!a || !a.value) return 'bg-gray-400 text-white'
-  switch (a.value) {
-    case 'confirm-delete-session':
-      return 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-400'
-    case 'cancel-delete-session':
-      return 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-400'
-    case 'gen-fb':
-      return 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-400'
-    case 'gen-ig':
-      return 'bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-400'
-    case 'gen-tiktok':
-      return 'bg-gray-800 text-white hover:bg-black focus:ring-gray-500'
-    case 'gen-shortcaption':
-      return 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-400'
-    case 'post-facebook':
-      return 'bg-[#1877F2] text-white hover:brightness-110 focus:ring-blue-300'
-    case 'copy-text':
-      return 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-400'
-    default:
-      // ปุ่มอื่น ๆ (ถ้ามีในอนาคต) ใช้โทนกลางตามบทบาท
-      return m.role === 'assistant'
-        ? 'bg-white/10 text-slate-800 dark:text-white hover:bg-white/20 border border-slate-300/30'
-        : 'bg-blue-600 text-white hover:bg-blue-700 border border-blue-700'
-  }
-}
-
-// Generate Demo AI Reply
-function generateDemoReply(userMessage) {
-  const msg = userMessage.toLowerCase()
-
-  // ตรวจจับคำหลัก
-  if (msg.includes('สวัสดี') || msg.includes('hello') || msg.includes('hi')) {
-    return 'สวัสดีครับ! ยินดีต้อนรับ 😊 มีอะไรให้ช่วยเหลือไหมครับ?'
-  }
-  if (msg.includes('ขอบคุณ') || msg.includes('thanks') || msg.includes('ありがとう')) {
-    return 'ไม่เป็นไรครับ! ยินดีให้บริการ 🙏'
-  }
-  if (msg.includes('คุณชื่ออะไร') || msg.includes('who are you') || msg.includes('ชื่อ')) {
-    return 'ผมชื่อ ChatBot N8N ครับ! ยินดีที่ได้รู้จัก 🤖'
-  }
-  if (msg.includes('วันนี้สัตริยะ') || msg.includes('weather') || msg.includes('อากาศ')) {
-    return 'วันนี้อากาศดีเลยครับ! ☀️ (ข้อมูลสาธารณะ: Demo Mode)'
-  }
-  if (msg.includes('เวลา') || msg.includes('time') || msg.includes('กี่โมง')) {
-    return `เวลาตอนนี้ ${new Date().toLocaleTimeString('th-TH')} ครับ ⏰`
-  }
-  if (msg.includes('วันที่') || msg.includes('date')) {
-    return `วันที่ ${new Date().toLocaleDateString('th-TH')} ครับ 📅`
-  }
-  if (msg.includes('ช่วย') || msg.includes('help')) {
-    return 'ข้อโทษครับ นี่คือ Demo Mode ผมสามารถช่วยได้เพียงแค่สนทนาธรรมชาติเท่านั้น 📬'
-  }
-  if (msg.includes('ด้วย') || msg.includes('with')) {
-    return 'ตกลงครับ สิ่งใดกี่ตัวตั้งแต่นั้น! 👏'
+// --- Core Chat Logic ---
+const sendMessage = async () => {
+  // 1. ตรวจจับคำว่า "โพสต์"
+  if (draft.value.trim() === 'โพสต์') {
+    draft.value = ''
+    showPostModal.value = true
+    autoResize()
+    return
   }
 
-  // คำตอบทั่วไป
-  const genericReplies = [
-    'เข้าใจแล้วครับ! 👍',
-    'ใช่ครับ เหมือนดีด้วย ✨',
-    'น่าสนใจครับ! 🤔',
-    'ขอบคุณที่บอกนะครับ 😊',
-    'ยอดเยี่ยมครับ! 🌟',
-    'ผมเข้าใจแล้ว เข้าใจแล้ว 💡',
-    'คุณพูดถูกครับ! 👌'
-  ]
+  // 2. ตรวจสอบข้อความปกติ
+  if (!draft.value.trim() && !pendingImage.value) return
+  if (typing.value) return
 
-  return genericReplies[Math.floor(Math.random() * genericReplies.length)]
-}
+  const textContent = draft.value
+  const imageContent = pendingImage.value
 
-// -----------------------------
-// Content suggestion helpers
-// -----------------------------
-function buildContentPrompt(kind, source) {
-  const base = source || 'หัวข้อที่ผู้ใช้ให้มา'
-  switch (kind) {
-    case 'gen-fb':
-      return `ช่วยสร้างโพสต์ Facebook ที่กระชับและน่าสนใจ (มี emoji เล็กน้อย) จากเนื้อหา: ${base}`
-    case 'gen-shortcaption':
-      return `สร้างแคปชั่นสั้นๆ 5 แบบ (ไม่เกิน 60 ตัวอักษร) จากเนื้อหา: ${base}`
-    default:
-      return ''
-  }
-}
-
-function trySuggestContentActions(userText) {
-  if (!userText) return
-  // ตรวจคำว่า 'คอนเทน' (ไม่สนตัวพิมพ์ใหญ่เล็ก)
-  const lowered = userText.toLowerCase()
-  if (!lowered.includes('คอนเทน')) return
-  // กันซ้ำ: ถ้าข้อความสุดท้ายที่เป็น assistant มี actions เหล่านี้อยู่แล้ว ไม่เพิ่มซ้ำ
-  const last = messages.value[messages.value.length - 1]
-  if (last && Array.isArray(last.actions) && last.actions.some(a => a.value.startsWith('gen-'))) return
-  messages.value.push({
-    role: 'assistant',
-    text: 'เลือกประเภทคอนเทนต์ แล้วพิมพ์หัวข้อ/รายละเอียดตามมาได้เลย:',
-    time: now(),
-    actions: [
-      { label: '📰 โพสต์ Facebook', value: 'gen-fb' },
-      { label: '✏️ แคปชั่นสั้น', value: 'gen-shortcaption' },
-    ]
-  })
-  nextTick(scroll)
-}
-
-// เรียก backend เพื่อโพสต์ Facebook
-async function postFacebook(text) {
-  const msg = String(text || '').trim()
-  if (!msg) return
-  const token = getToken()
-  if (!token) { logout(); return }
-  try {
-    const res = await axios.post('/apifb/api/facebook/post', { message: msg }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    const id = res?.data?.result?.id || '(no id)'
-    messages.value.push({ role: 'assistant', text: `โพสต์ขึ้น Facebook แล้ว: ${id}`, time: now() })
-  } catch (e) {
-    const msg = e?.response?.data?.error || e?.message || 'โพสต์ไม่สำเร็จ'
-    messages.value.push({ role: 'assistant', text: `โพสต์ไม่สำเร็จ: ${msg}`, time: now() })
-  }
-  await nextTick(); scroll();
-}
-
-/* -----------------------------
-   Facebook Settings Modal
------------------------------ */
-function openFbModal() {
-  showFbModal.value = true
-  fbStatus.value = null
-  loadFbSettings()
-}
-function closeFbModal() {
-  showFbModal.value = false
-  fbStatus.value = null
-}
-async function loadFbSettings() {
-  const token = getToken()
-  if (!token) { logout(); return }
-  try {
-  const res = await axios.get('/apifb/api/facebook/token', { headers: { Authorization: `Bearer ${token}` } })
-    fbForm.value.pageId = res?.data?.pageId || ''
-    fbForm.value.graphVersion = res?.data?.graphVersion || fbForm.value.graphVersion
-  } catch (e) {
-    fbStatus.value = { ok: false, message: e?.response?.data?.error || e?.message || 'โหลดค่าไม่สำเร็จ' }
-  }
-}
-async function verifyFbSettings() {
-  fbStatus.value = null
-  const token = getToken()
-  if (!token) { logout(); return }
-  try {
-    const res = await axios.post('/apifb/api/facebook/verify', {
-      pageId: fbForm.value.pageId,
-      accessToken: fbForm.value.accessToken || undefined,
-      graphVersion: fbForm.value.graphVersion
-    }, { headers: { Authorization: `Bearer ${token}` } })
-    const used = res?.data?.used || {}
-    fbStatus.value = { ok: true, message: `ตรวจสอบสำเร็จ (Page: ${used.pageId || fbForm.value.pageId}, Version: ${res?.data?.graphVersion || fbForm.value.graphVersion})` }
-  } catch (e) {
-    const errData = e?.response?.data
-    const details = errData?.details
-    const code = details?.error?.code
-    const type = details?.error?.type
-    const status = details?.status
-    const rawMsg = (typeof errData?.error === 'string' ? errData?.error : '') || details?.error?.message || e?.message || 'unknown error'
-    const ver = details?.graphVersion || fbForm.value.graphVersion
-    const usedPage = details?.used?.pageId || fbForm.value.pageId
-    // Friendly mapping for common Graph errors
-    let friendly = rawMsg
-    if (status === 400 && String(type).includes('GraphMethodException') && /Object with ID/i.test(String(rawMsg)) ) {
-      friendly = 'Page ID ไม่ถูกต้อง'
-    }
-    const compact = [`ตรวจสอบล้มเหลว`, status ? `HTTP ${status}` : null, code ? `CODE ${code}` : null, type ? `TYPE ${type}` : null].filter(Boolean).join(' | ')
-    fbStatus.value = { ok: false, message: `${compact}: ${friendly} (Page: ${usedPage}, Version: ${ver})` }
-  }
-}
-function chooseVersion(v) {
-  fbForm.value.graphVersion = v
-  showVersionMenu.value = false
-}
-async function saveFbSettings() {
-  fbStatus.value = null
-  const token = getToken()
-  if (!token) { logout(); return }
-  try {
-    await axios.patch('/apifb/api/facebook/token', {
-      pageId: fbForm.value.pageId,
-      graphVersion: fbForm.value.graphVersion
-    }, { headers: { Authorization: `Bearer ${token}` } })
-    fbStatus.value = { ok: true, message: 'บันทึกสำเร็จ' }
-    // ปิด popup อัตโนมัติหลังบันทึกสำเร็จ
-    showFbModal.value = false
-  } catch (e) {
-    fbStatus.value = { ok: false, message: e?.response?.data?.error || e?.message || 'บันทึกไม่สำเร็จ' }
-  }
-}
-
-// รีเซ็ต UI ห้องแชทและช่องพิมพ์หลังจากล้าง Session สำเร็จ
-async function resetChatUI() {
-  messages.value = [
-    { role: 'assistant', text: 'ล้างประวัติแชทของห้องนี้แล้ว เริ่มคุยใหม่ได้เลย 😊', time: now() }
-  ]
   draft.value = ''
+  pendingImage.value = null
+  if (textArea.value) textArea.value.style.height = 'auto'
+
+  messages.value.push({
+    id: Date.now(),
+    role: 'user',
+    text: textContent,
+    image: imageContent,
+    time: getTime()
+  })
+
+  scrollToBottom()
+  typing.value = true
+
+  try {
+    const form = new FormData()
+    form.append('chatInput', textContent)
+    form.append('sessionId', sessionId)
+    if (imageContent) form.append('file', dataURLtoFile(imageContent, 'image.jpg'))
+
+    const res = await axios.post(webhookUrl.value, form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    handleResponse(res.data)
+  } catch (err) {
+    handleError(err)
+  }
+}
+
+const handleResponse = (data) => {
+  let aiReply = ''
+  // พยายามหาข้อความตอบกลับจาก n8n
+  if (typeof data === 'string') aiReply = data
+  else if (typeof data === 'object') {
+    // ถ้า n8n ส่งกลับมาเป็น JSON { text: "..." } หรือ { output: "..." }
+    aiReply = data.output || data.text || data.response || data.message || JSON.stringify(data, null, 2)
+  }
+
+  if (!aiReply) aiReply = '✅ ได้รับข้อมูลแล้ว (ไม่มีข้อความตอบกลับ)'
+
+  messages.value.push({
+    id: Date.now() + 1,
+    role: 'assistant',
+    text: aiReply,
+    time: getTime()
+  })
   typing.value = false
-  await nextTick()
-  scroll()
+  scrollToBottom()
 }
 
-// แสดงผล: ตัดบรรทัดไม่เกิน N ตัวอักษรต่อบรรทัด (default 50)
-const displayLineChars = 50
-function formatDisplay(text) {
-  if (!text) return ''
-  const lines = String(text).split(/\r?\n/)
-  const wrapped = []
-  for (const line of lines) {
-    const segs = graphemeSegments(line) || Array.from(line)
-    if (!segs.length) { wrapped.push(''); continue }
-    for (let i = 0; i < segs.length; i += displayLineChars) {
-      const slice = segs.slice(i, i + displayLineChars)
-      if (slice.length === 0) continue
-      if (Array.isArray(slice[0]) || typeof slice[0] === 'object') {
-        // เมื่อใช้ Intl.Segmenter จะได้ object { segment, index, ... }
-        wrapped.push(slice.map(s => s.segment).join(''))
-      } else {
-        // fallback: array ของตัวอักษร
-        wrapped.push(slice.join(''))
-      }
-    }
-  }
-  return wrapped.join('\n')
+const handleError = (err) => {
+  console.error(err)
+  let msg = err.message
+  if (err.response && err.response.status === 404) msg = 'ไม่พบ Webhook URL (404)'
+  messages.value.push({
+    id: Date.now() + 1,
+    role: 'assistant',
+    text: `⚠️ Error: ${msg}\nกรุณาตรวจสอบการตั้งค่า Webhook`,
+    time: getTime()
+  })
+  typing.value = false
+  scrollToBottom()
 }
-
-// Helper: ดึงโทเคนจาก localStorage หลายคีย์ที่อาจใช้
-function getToken() {
-  return (
-    localStorage.getItem('authToken') ||
-    localStorage.getItem('token') ||
-    ''
-  )
-}
-
-/* Save Chat to LocalStorage */
-function saveToLocalStorage() {
-  try {
-    const chatData = messages.value.map(m => ({
-      role: m.role,
-      content: m.text,
-      time: m.time
-    }))
-    localStorage.setItem('demoChatHistory', JSON.stringify(chatData))
-  } catch (e) {
-    console.warn('Failed to save chat history:', e?.message)
-  }
-}
-
-// ดึงประวัติจาก Session (หรือ localStorage ใน Demo Mode)
-async function loadSessionHistory() {
-  const token = getToken()
-  if (!token) return
-
-  try {
-    // พยายามโหลดจาก API ถ้ามี
-    try {
-      const response = await axios.get(SESSION_HISTORY_URL, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-
-      const history = response?.data?.messages || []
-      const mapped = history
-        .filter(m => m && m.role && typeof m.content === 'string')
-        .map(m => ({ role: m.role, text: m.content, time: now() }))
-
-      messages.value = [messages.value[0], ...mapped]
-      await nextTick()
-      scroll()
-      return
-    } catch (apiError) {
-      console.warn('API loadSessionHistory failed (Demo Mode):', apiError?.message)
-    }
-  } catch (e) {
-    console.warn('loadSessionHistory error:', e?.message)
-  }
-
-  // Demo Mode: โหลดจาก localStorage
-  const savedHistory = localStorage.getItem('demoChatHistory')
-  if (savedHistory) {
-    try {
-      const history = JSON.parse(savedHistory)
-      messages.value = [messages.value[0], ...history]
-      await nextTick()
-      scroll()
-    } catch (e) {
-      console.warn('Failed to parse chat history:', e?.message)
-    }
-  }
-}
-
-/* -----------------------------
-   Logout (อัปเดต)
------------------------------ */
-function logout() {
-  // 💡 [อัปเดต] ล้างข้อมูลทั้งหมด
-  localStorage.removeItem('loggedIn')
-  localStorage.removeItem('authToken')
-  localStorage.removeItem('userName') // 👈 ล้างชื่อด้วย
-  router.push('/login')
-}
-
-/* Navigation */
 </script>
 
 <style scoped>
-.glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; border: 2px solid transparent; background-clip: content-box; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #475569; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #64748b; }
+
+.animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.dark .glass {
-  background: rgba(255, 255, 255, 0.05);
-}
-.chat::-webkit-scrollbar { width: 10px; }
-.chat::-webkit-scrollbar-thumb { background: rgba(148,163,184,.5); border-radius: 999px; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>

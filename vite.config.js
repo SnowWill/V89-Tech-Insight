@@ -34,6 +34,18 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }
+      ,
+      // Proxy n8n webhook paths to local n8n (avoid CORS during dev)
+      '/webhook': {
+        target: 'http://localhost:5678',
+        changeOrigin: true,
+        rewrite: (path) => path, // keep path as-is
+      },
+      '/workflow': {
+        target: 'http://localhost:5678',
+        changeOrigin: true,
+        rewrite: (path) => path, // keep path as-is; frontend will usually be normalized to /webhook
+      }
     }
   }
 })
